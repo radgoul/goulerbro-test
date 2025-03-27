@@ -312,5 +312,55 @@
       }
     });
   </script>
+
+  <audio id="bgMusic" src="Koopsta Knicca - Hoe Don't Violate.mp3" loop></audio>
+  <script>
+    // Play music on user interaction
+    let musicStarted = false;
+    document.body.addEventListener('click', () => {
+      if (!musicStarted) {
+        const audio = document.getElementById('bgMusic');
+        audio.volume = 0.75;
+        audio.play().catch(e => console.log('Autoplay blocked:', e));
+        musicStarted = true;
+      }
+    });
+
+    const chatInput = document.getElementById('chatInput');
+    const chatBox = document.getElementById('chatBox');
+
+    chatInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        const msg = this.value.trim();
+        if (msg) {
+          const user = document.createElement('div');
+          user.textContent = '> ' + msg;
+          chatBox.appendChild(user);
+
+          const typing = document.createElement('div');
+          typing.textContent = 'radbro is typing...';
+          typing.style.fontStyle = 'italic';
+          typing.style.color = '#888';
+          typing.id = 'typing';
+          chatBox.appendChild(typing);
+          chatBox.scrollTop = chatBox.scrollHeight;
+
+          setTimeout(() => {
+            const bot = document.createElement('div');
+            bot.textContent = 'radbro';
+            bot.style.color = 'yellow';
+            bot.style.marginLeft = '10px';
+            chatBox.removeChild(typing);
+            chatBox.appendChild(bot);
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }, 1000);
+
+          this.value = '';
+        }
+      }
+    });
+  </script>
 </body>
+</html>
+
 </html>
