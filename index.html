@@ -121,6 +121,125 @@
   </style>
 </head>
 <body>
-  <!-- Your body content will be appended here -->
+  <canvas id="canvas" width="500" height="500"></canvas>
+  <div class="controls">
+    <button onclick="randomize()">RANDOMIZE</button>
+    <button onclick="downloadImage()">SAVE IMAGE</button>
+  </div>
+  <div class="wrapper">
+    <div class="menu" id="controls"></div>
+  </div>
+  <img class="logo-overlay" src="tag001.png" alt="Logo Tag">
+
+  <script>
+    const traits = [
+      { name: 'BG', optional: false },
+      { name: 'back hidden', optional: true, chance: 0.4 },
+      { name: 'SHRT', optional: false },
+      { name: 'head', optional: false },
+      { name: 'eyes', optional: false },
+      { name: 'MOUF', optional: false },
+      { name: 'armor', optional: true, chance: 0.35 },
+      { name: 'HAHT', optional: true, chance: 0.3 },
+      { name: 'shades', optional: true, chance: 0.25 },
+      { name: 'logogogo', optional: false },
+      { name: 'overlay', optional: true, chance: 0.2 },
+    ];
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let saveCounter = 1;
+
+    window.onbeforeunload = function () {
+      return 'Are you sure you want to leave this page?';
+    };
+
+    function createControls() {
+      const controls = document.getElementById('controls');
+      traits.forEach(trait => {
+        const label = document.createElement('div');
+        label.className = 'custom-dropdown';
+        label.textContent = trait.name.toUpperCase();
+
+        const optionsBox = document.createElement('div');
+        optionsBox.className = 'custom-options';
+        optionsBox.id = `options-${trait.name}`;
+
+        label.onclick = () => {
+          optionsBox.style.display = optionsBox.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        controls.appendChild(label);
+        controls.appendChild(optionsBox);
+      });
+    }
+
+    async function loadTraitOptions() {
+      for (const trait of traits) {
+        const res = await fetch(`${trait.name}/index.json`);
+        const options = await res.json();
+        const optionsBox = document.getElementById(`options-${trait.name}`);
+        options.forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'custom-option';
+          const img = document.createElement('img');
+          img.src = `${trait.name}/${opt}`;
+          img.alt = opt;
+          const name = document.createElement('span');
+          name.textContent = opt.replace(/\.[^/.]+$/, "");
+          item.appendChild(img);
+          item.appendChild(name);
+          item.onclick = () => {
+            item.parentNode.dataset.selected = opt;
+            draw();
+          };
+          optionsBox.appendChild(item);
+        });
+      }
+    }
+
+    async function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const trait of traits) {
+        const optionsBox = document.getElementById(`options-${trait.name}`);
+        const selected = optionsBox.dataset.selected;
+        if (selected) {
+          const img = new Image();
+          await new Promise(resolve => {
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve();
+            };
+            img.src = `${trait.name}/${selected}`;
+          });
+        }
+      }
+    }
+
+    function randomize() {
+      traits.forEach(trait => {
+        const optionsBox = document.getElementById(`options-${trait.name}`);
+        const imgs = Array.from(optionsBox.querySelectorAll('img'));
+        if (trait.optional && Math.random() > trait.chance) {
+          optionsBox.dataset.selected = "";
+        } else if (imgs.length) {
+          const choice = imgs[Math.floor(Math.random() * imgs.length)];
+          optionsBox.dataset.selected = choice.alt;
+        }
+      });
+      draw();
+    }
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = `goulerbro-${saveCounter}.png`;
+      saveCounter++;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    createControls();
+    loadTraitOptions();
+  </script>
 </body>
 </html>
