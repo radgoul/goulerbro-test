@@ -149,10 +149,7 @@
     <button onclick="downloadImage()">SAVE IMAGE</button>
   </div>
 
-  
-    
-    <div class="upload">
-
+  <div class="upload">
     <label style="background: yellow; padding: 8px 12px; color: black; font-weight: bold; cursor: pointer; border: 2px solid black;">
       Upload Background
       <input type="file" id="bgUpload" accept="image/*" style="display: none;">
@@ -371,10 +368,11 @@
 
   <audio id="bgMusic" src="Koopsta Knicca - Hoe Don't Violate.mp3" loop></audio>
   <script>
-    let musicStarted = false;
     const audio = document.getElementById('bgMusic');
-    const gifToggle = document.getElementById('musicToggle');
+    const musicToggle = document.getElementById('musicToggle');
+    let musicStarted = false;
 
+    // First click anywhere starts music
     document.body.addEventListener('click', () => {
       if (!musicStarted) {
         audio.volume = 0.75;
@@ -383,13 +381,13 @@
       }
     });
 
-    gifToggle.addEventListener('click', () => {
+    // Click the emoji.gif to toggle music
+    musicToggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // prevent triggering autoplay again
       if (audio.paused) {
         audio.play();
-        // updated via GIF UI
       } else {
         audio.pause();
-        // updated via GIF UI
       }
     });
 
