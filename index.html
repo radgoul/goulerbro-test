@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Neue', Comic Sans MS, cursive;
-      background: #000 url('radbro.PNG') no-repeat center center fixed;
+      background: url('./radbro.PNG') no-repeat center center fixed;
       background-size: cover;
       color: white;
       display: flex;
@@ -18,6 +18,7 @@
       align-items: center;
       min-height: 100vh;
       flex-direction: column;
+      position: relative;
     }
     .wrapper {
       display: flex;
@@ -48,20 +49,30 @@
     .custom-options {
       display: none;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
       background: white;
       border: 2px solid black;
       max-height: 200px;
       overflow-y: auto;
       margin-bottom: 10px;
+      padding: 5px;
     }
-    .custom-options img {
-      width: 100px;
+    .custom-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       cursor: pointer;
-      border: 2px solid transparent;
+      font-family: 'Comic Neue', Comic Sans MS, cursive;
+      font-size: 14px;
+      padding: 5px;
     }
-    .custom-options img:hover {
-      border-color: black;
+    .custom-option:hover {
+      background-color: #f0f0f0;
+    }
+    .custom-option img {
+      width: 40px;
+      height: auto;
+      border: 2px solid transparent;
     }
     .menu button {
       background: yellow;
@@ -82,6 +93,14 @@
       gap: 20px;
       justify-content: center;
     }
+    .logo-overlay {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      width: 100px;
+      opacity: 0.8;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -93,6 +112,7 @@
     <button onclick="randomize()">RANDOMIZE</button>
     <button onclick="downloadImage()">SAVE IMAGE</button>
   </div>
+  <img class="logo-overlay" src="tag001.png" alt="Logo Tag">
 
   <script>
     const traits = [
@@ -100,8 +120,8 @@
       { name: 'back hidden', optional: true, chance: 0.4 },
       { name: 'SHRT', optional: false },
       { name: 'head', optional: false },
-      { name: 'MOUF', optional: false },
       { name: 'eyes', optional: false },
+      { name: 'MOUF', optional: false },
       { name: 'armor', optional: true, chance: 0.35 },
       { name: 'HAHT', optional: true, chance: 0.3 },
       { name: 'shades', optional: true, chance: 0.25 },
@@ -143,14 +163,20 @@
         const options = await res.json();
         const optionsBox = document.getElementById(`options-${trait.name}`);
         options.forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'custom-option';
           const img = document.createElement('img');
           img.src = `${trait.name}/${opt}`;
           img.alt = opt;
-          img.onclick = () => {
-            img.parentNode.dataset.selected = opt;
+          const name = document.createElement('span');
+          name.textContent = opt.replace(/\.[^/.]+$/, "");
+          item.appendChild(img);
+          item.appendChild(name);
+          item.onclick = () => {
+            item.parentNode.dataset.selected = opt;
             draw();
           };
-          optionsBox.appendChild(img);
+          optionsBox.appendChild(item);
         });
       }
     }
