@@ -10,7 +10,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Comic Neue', Comic Sans MS, cursive;
-      background: url('radbro.PNG') no-repeat center center fixed;
+      background: #000 url('radbro.PNG') no-repeat center center fixed;
       background-size: cover;
       color: white;
     }
@@ -69,7 +69,9 @@
   </style>
 </head>
 <body>
-  <iframe width="0" height="0" src="https://www.youtube.com/embed/ysEAZgdvr40?autoplay=1&loop=1&playlist=ysEAZgdvr40" title="Music" frameborder="0" allow="autoplay"></iframe>
+  <button onclick="startAudio()" style="position:fixed;top:10px;left:10px;z-index:9999;padding:10px;background:lime;border:2px solid black;cursor:pointer;font-family:'Comic Neue';">🔊 Start Music + Sounds</button>
+
+  <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/ysEAZgdvr40?enablejsapi=1&loop=1&playlist=ysEAZgdvr40" title="Music" frameborder="0"></iframe>
   <audio id="laserSound" src="https://freesound.org/data/previews/342/342756_3248244-lq.mp3"></audio>
 
   <div class="container">
@@ -99,10 +101,22 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let saveCounter = 1;
+    let laserEnabled = false;
 
     window.onbeforeunload = function () {
       return 'Are you sure you want to leave this page?';
     };
+
+    function startAudio() {
+      document.getElementById('laserSound').play().then(() => {
+        laserEnabled = true;
+      }).catch(() => {});
+
+      const player = new YT.Player('bgMusic');
+      player.mute();
+      player.unMute();
+      player.playVideo();
+    }
 
     function createControls() {
       const controls = document.getElementById('controls');
@@ -176,9 +190,11 @@
     }
 
     function playLaser() {
-      const sound = document.getElementById('laserSound');
-      sound.currentTime = 0;
-      sound.play();
+      if (laserEnabled) {
+        const sound = document.getElementById('laserSound');
+        sound.currentTime = 0;
+        sound.play();
+      }
     }
 
     function downloadImage() {
@@ -192,5 +208,6 @@
     createControls();
     loadTraitOptions();
   </script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
