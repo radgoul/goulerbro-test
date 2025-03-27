@@ -60,6 +60,9 @@
       font-size: 22px;
     }
     .custom-options {
+  max-height: 400px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
       display: none;
       flex-direction: column;
       gap: 6px;
@@ -372,7 +375,6 @@
     const musicToggle = document.getElementById('musicToggle');
     let musicStarted = false;
 
-    // First click anywhere starts music
     document.body.addEventListener('click', () => {
       if (!musicStarted) {
         audio.volume = 0.75;
@@ -381,9 +383,8 @@
       }
     });
 
-    // Click the emoji.gif to toggle music
     musicToggle.addEventListener('click', (e) => {
-      e.stopPropagation(); // prevent triggering autoplay again
+      e.stopPropagation(); // stop click from bubbling
       if (audio.paused) {
         audio.play();
       } else {
@@ -423,6 +424,22 @@
           this.value = '';
         }
       }
+    });
+
+    // Close other dropdowns when one opens
+    document.addEventListener("DOMContentLoaded", () => {
+      const dropdowns = document.querySelectorAll('.custom-dropdown');
+      dropdowns.forEach(drop => {
+        drop.addEventListener('click', () => {
+          const thisOptions = drop.nextElementSibling;
+          document.querySelectorAll('.custom-options').forEach(opt => {
+            if (opt !== thisOptions) {
+              opt.style.display = 'none';
+            }
+          });
+          thisOptions.style.display = thisOptions.style.display === 'flex' ? 'none' : 'flex';
+        });
+      });
     });
   </script>
 </body>
