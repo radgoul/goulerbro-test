@@ -1,30 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Goulerbros V2 Maker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goulerbro Maker</title>
   <style>
-    body { font-family: sans-serif; background: #111; color: white; padding: 20px; }
-    .container { display: flex; flex-direction: row; gap: 20px; }
-    .controls { flex: 1; }
-    .preview { flex: 1; display: flex; justify-content: center; align-items: center; }
-    canvas { border: 1px solid #444; background: transparent; }
-    select { margin-bottom: 10px; display: block; width: 100%; padding: 8px; background: #222; color: white; border: none; }
-    button { margin-top: 10px; padding: 10px 15px; background: #444; color: white; border: none; cursor: pointer; }
-    button:hover { background: #666; }
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Neue', Comic Sans MS, cursive;
+      background: url('radbro.PNG') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+    .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 40px;
+    }
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .custom-dropdown {
+      background: rgba(255, 255, 255, 0.85);
+      color: black;
+      font-family: 'Comic Neue', Comic Sans MS, cursive;
+      padding: 10px;
+      border: 3px dashed black;
+      cursor: pointer;
+      text-align: center;
+      font-size: 18px;
+    }
+    .custom-options {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: white;
+      border: 2px solid black;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    .custom-options img {
+      width: 100px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .custom-options img:hover {
+      border-color: black;
+    }
+    .menu button {
+      background: yellow;
+      border: 2px solid black;
+      font-weight: bold;
+      font-size: 18px;
+      padding: 10px;
+      font-family: 'Comic Neue', Comic Sans MS, cursive;
+      cursor: pointer;
+    }
+    #canvas {
+      border: 3px solid white;
+      background: transparent;
+    }
   </style>
 </head>
 <body>
-  <h1>Goulerbros V2 Character Creator</h1>
+  <iframe width="0" height="0" src="https://www.youtube.com/embed/ysEAZgdvr40?autoplay=1&loop=1&playlist=ysEAZgdvr40" title="Music" frameborder="0" allow="autoplay"></iframe>
+  <audio id="laserSound" src="https://freesound.org/data/previews/342/342756_3248244-lq.mp3"></audio>
+
   <div class="container">
-    <div class="controls" id="controls"></div>
-    <div class="preview">
-      <canvas id="canvas" width="500" height="500"></canvas>
-    </div>
+    <div class="menu" id="controls"></div>
+    <canvas id="canvas" width="500" height="500"></canvas>
   </div>
-  <button onclick="randomize()">Randomize</button>
-  <button onclick="downloadImage()">Download</button>
+  <div class="container">
+    <button onclick="randomize(); playLaser();">RANDOMIZE</button>
+    <button onclick="downloadImage()">SAVE IMAGE</button>
+  </div>
 
   <script>
     const traits = [
@@ -41,20 +96,31 @@
       { name: 'overlay', optional: true, chance: 0.2 },
     ];
 
-    const selections = {};
-    const images = {};
-
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    let saveCounter = 1;
+
+    window.onbeforeunload = function () {
+      return 'Are you sure you want to leave this page?';
+    };
 
     function createControls() {
       const controls = document.getElementById('controls');
       traits.forEach(trait => {
-        const select = document.createElement('select');
-        select.id = trait.name;
-        select.innerHTML = `<option value="">None</option>`;
-        select.addEventListener('change', draw);
-        controls.appendChild(select);
+        const label = document.createElement('div');
+        label.className = 'custom-dropdown';
+        label.textContent = trait.name.toUpperCase();
+
+        const optionsBox = document.createElement('div');
+        optionsBox.className = 'custom-options';
+        optionsBox.id = `options-${trait.name}`;
+
+        label.onclick = () => {
+          optionsBox.style.display = optionsBox.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        controls.appendChild(label);
+        controls.appendChild(optionsBox);
       });
     }
 
@@ -62,12 +128,17 @@
       for (const trait of traits) {
         const res = await fetch(`${trait.name}/index.json`);
         const options = await res.json();
-        const select = document.getElementById(trait.name);
+        const optionsBox = document.getElementById(`options-${trait.name}`);
         options.forEach(opt => {
-          const o = document.createElement('option');
-          o.value = opt;
-          o.textContent = opt;
-          select.appendChild(o);
+          const img = document.createElement('img');
+          img.src = `${trait.name}/${opt}`;
+          img.alt = opt;
+          img.onclick = () => {
+            img.parentNode.dataset.selected = opt;
+            draw();
+            playLaser();
+          };
+          optionsBox.appendChild(img);
         });
       }
     }
@@ -75,15 +146,16 @@
     async function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (const trait of traits) {
-        const val = document.getElementById(trait.name).value;
-        if (val) {
+        const optionsBox = document.getElementById(`options-${trait.name}`);
+        const selected = optionsBox.dataset.selected;
+        if (selected) {
           const img = new Image();
           await new Promise(resolve => {
             img.onload = () => {
               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
               resolve();
             };
-            img.src = `${trait.name}/${val}`;
+            img.src = `${trait.name}/${selected}`;
           });
         }
       }
@@ -91,21 +163,28 @@
 
     function randomize() {
       traits.forEach(trait => {
-        const select = document.getElementById(trait.name);
-        const options = Array.from(select.options).filter(o => o.value);
+        const optionsBox = document.getElementById(`options-${trait.name}`);
+        const imgs = Array.from(optionsBox.querySelectorAll('img'));
         if (trait.optional && Math.random() > trait.chance) {
-          select.value = "";
-        } else {
-          const choice = options[Math.floor(Math.random() * options.length)];
-          select.value = choice?.value || "";
+          optionsBox.dataset.selected = "";
+        } else if (imgs.length) {
+          const choice = imgs[Math.floor(Math.random() * imgs.length)];
+          optionsBox.dataset.selected = choice.alt;
         }
       });
       draw();
     }
 
+    function playLaser() {
+      const sound = document.getElementById('laserSound');
+      sound.currentTime = 0;
+      sound.play();
+    }
+
     function downloadImage() {
       const link = document.createElement('a');
-      link.download = 'goulerbro.png';
+      link.download = `goulerbro-${saveCounter}.png`;
+      saveCounter++;
       link.href = canvas.toDataURL();
       link.click();
     }
