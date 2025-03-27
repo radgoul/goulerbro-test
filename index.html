@@ -148,7 +148,14 @@
     <button onclick="downloadImage()">SAVE IMAGE</button>
   </div>
 
-  <div class="upload">
+  
+    <div class="controls">
+      <button id="toggleMusic" style="background: yellow; border: 2px solid black; font-weight: bold; font-size: 20px; padding: 10px; cursor: pointer;">
+        🎶 MUSIC: ON
+      </button>
+    </div>
+    <div class="upload">
+
     <label style="background: yellow; padding: 8px 12px; color: black; font-weight: bold; cursor: pointer; border: 2px solid black;">
       Upload Background
       <input type="file" id="bgUpload" accept="image/*" style="display: none;">
@@ -364,7 +371,68 @@
       }
     });
   </script>
+
+  <audio id="bgMusic" src="Koopsta Knicca - Hoe Don't Violate.mp3" loop></audio>
+  <script>
+    let musicStarted = false;
+    const audio = document.getElementById('bgMusic');
+    const toggleMusicBtn = document.getElementById('toggleMusic');
+
+    document.body.addEventListener('click', () => {
+      if (!musicStarted) {
+        audio.volume = 0.75;
+        audio.play().catch(e => console.log('Autoplay blocked:', e));
+        musicStarted = true;
+      }
+    });
+
+    toggleMusicBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        toggleMusicBtn.textContent = "🎶 MUSIC: ON";
+      } else {
+        audio.pause();
+        toggleMusicBtn.textContent = "🎶 MUSIC: OFF";
+      }
+    });
+
+    const chatInput = document.getElementById('chatInput');
+    const chatBox = document.getElementById('chatBox');
+
+    chatInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        const msg = this.value.trim();
+        if (msg) {
+          const user = document.createElement('div');
+          user.textContent = '> ' + msg;
+          chatBox.appendChild(user);
+
+          const typing = document.createElement('div');
+          typing.textContent = 'radbro is typing...';
+          typing.style.fontStyle = 'italic';
+          typing.style.color = '#888';
+          typing.id = 'typing';
+          chatBox.appendChild(typing);
+          chatBox.scrollTop = chatBox.scrollHeight;
+
+          setTimeout(() => {
+            chatBox.removeChild(typing);
+            const bot = document.createElement('div');
+            bot.textContent = 'radbro';
+            bot.style.color = 'yellow';
+            bot.style.marginLeft = '10px';
+            chatBox.appendChild(bot);
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }, 1000);
+
+          this.value = '';
+        }
+      }
+    });
+  </script>
 </body>
+</html>
+
 </html>
 
 </html>
