@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goulerbros V2 Maker</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: white; padding: 20px; }
+    .container { display: flex; flex-direction: row; gap: 20px; }
+    .controls { flex: 1; }
+    .preview { flex: 1; display: flex; justify-content: center; align-items: center; }
+    canvas { border: 1px solid #444; background: transparent; }
+    select { margin-bottom: 10px; display: block; width: 100%; padding: 8px; background: #222; color: white; border: none; }
+    button { margin-top: 10px; padding: 10px 15px; background: #444; color: white; border: none; cursor: pointer; }
+    button:hover { background: #666; }
+  </style>
+</head>
+<body>
+  <h1>Goulerbros V2 Character Creator</h1>
+  <div class="container">
+    <div class="controls" id="controls"></div>
+    <div class="preview">
+      <canvas id="canvas" width="500" height="500"></canvas>
+    </div>
+  </div>
+  <button onclick="randomize()">Randomize</button>
+  <button onclick="downloadImage()">Download</button>
+
+  <script>
+    const traits = [
+      { name: 'BG', optional: false },
+      { name: 'back hidden', optional: true, chance: 0.4 },
+      { name: 'SHRT', optional: false },
+      { name: 'head', optional: false },
+      { name: 'MOUF', optional: false },
+      { name: 'eyes', optional: false },
+      { name: 'armor', optional: true, chance: 0.35 },
+      { name: 'HAHT', optional: true, chance: 0.3 },
+      { name: 'shades', optional: true, chance: 0.25 },
+      { name: 'logogogo', optional: false },
+      { name: 'overlay', optional: true, chance: 0.2 },
+    ];
+
+    const selections = {};
+    const images = {};
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    function createControls() {
+      const controls = document.getElementById('controls');
+      traits.forEach(trait => {
+        const select = document.createElement('select');
+        select.id = trait.name;
+        select.innerHTML = `<option value="">None</option>`;
+        select.addEventListener('change', draw);
+        controls.appendChild(select);
+      });
+    }
+
+    async function loadTraitOptions() {
+      for (const trait of traits) {
+        const res = await fetch(`${trait.name}/index.json`);
+        const options = await res.json();
+        const select = document.getElementById(trait.name);
+        options.forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt;
+          o.textContent = opt;
+          select.appendChild(o);
+        });
+      }
+    }
+
+    async function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const trait of traits) {
+        const val = document.getElementById(trait.name).value;
+        if (val) {
+          const img = new Image();
+          await new Promise(resolve => {
+            img.onload = () => {
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve();
+            };
+            img.src = `${trait.name}/${val}`;
+          });
+        }
+      }
+    }
+
+    function randomize() {
+      traits.forEach(trait => {
+        const select = document.getElementById(trait.name);
+        const options = Array.from(select.options).filter(o => o.value);
+        if (trait.optional && Math.random() > trait.chance) {
+          select.value = "";
+        } else {
+          const choice = options[Math.floor(Math.random() * options.length)];
+          select.value = choice?.value || "";
+        }
+      });
+      draw();
+    }
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = 'goulerbro.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    createControls();
+    loadTraitOptions();
+  </script>
+</body>
+</html>
