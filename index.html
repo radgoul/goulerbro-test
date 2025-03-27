@@ -69,17 +69,12 @@
   </style>
 </head>
 <body>
-  <button onclick="startAudio()" style="position:fixed;top:10px;left:10px;z-index:9999;padding:10px;background:lime;border:2px solid black;cursor:pointer;font-family:'Comic Neue';">🔊 Start Music + Sounds</button>
-
-  <iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/ysEAZgdvr40?enablejsapi=1&loop=1&playlist=ysEAZgdvr40" title="Music" frameborder="0"></iframe>
-  <audio id="laserSound" src="https://freesound.org/data/previews/342/342756_3248244-lq.mp3"></audio>
-
   <div class="container">
     <div class="menu" id="controls"></div>
     <canvas id="canvas" width="500" height="500"></canvas>
   </div>
   <div class="container">
-    <button onclick="randomize(); playLaser();">RANDOMIZE</button>
+    <button onclick="randomize()">RANDOMIZE</button>
     <button onclick="downloadImage()">SAVE IMAGE</button>
   </div>
 
@@ -101,22 +96,10 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     let saveCounter = 1;
-    let laserEnabled = false;
 
     window.onbeforeunload = function () {
       return 'Are you sure you want to leave this page?';
     };
-
-    function startAudio() {
-      document.getElementById('laserSound').play().then(() => {
-        laserEnabled = true;
-      }).catch(() => {});
-
-      const player = new YT.Player('bgMusic');
-      player.mute();
-      player.unMute();
-      player.playVideo();
-    }
 
     function createControls() {
       const controls = document.getElementById('controls');
@@ -150,7 +133,6 @@
           img.onclick = () => {
             img.parentNode.dataset.selected = opt;
             draw();
-            playLaser();
           };
           optionsBox.appendChild(img);
         });
@@ -189,14 +171,6 @@
       draw();
     }
 
-    function playLaser() {
-      if (laserEnabled) {
-        const sound = document.getElementById('laserSound');
-        sound.currentTime = 0;
-        sound.play();
-      }
-    }
-
     function downloadImage() {
       const link = document.createElement('a');
       link.download = `goulerbro-${saveCounter}.png`;
@@ -208,6 +182,5 @@
     createControls();
     loadTraitOptions();
   </script>
-  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
