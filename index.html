@@ -14,10 +14,9 @@
       background-size: cover;
       color: white;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      flex-direction: column;
       position: relative;
     }
     .wrapper {
@@ -28,6 +27,7 @@
       border: 4px solid white;
       border-radius: 20px;
       box-shadow: 0 0 20px #fff;
+      margin-top: 40px;
     }
     .menu {
       display: flex;
@@ -37,21 +37,21 @@
       overflow-y: auto;
     }
     .custom-dropdown {
-      background: rgba(255, 255, 255, 0.85);
-      color: black;
+      background: rgba(30, 30, 30, 0.85);
+      color: white;
       font-family: 'Comic Neue', Comic Sans MS, cursive;
-      padding: 10px;
-      border: 3px dashed black;
+      padding: 12px;
+      border: 3px dashed white;
       cursor: pointer;
       text-align: center;
-      font-size: 18px;
+      font-size: 22px;
     }
     .custom-options {
       display: none;
       flex-direction: column;
       gap: 6px;
-      background: white;
-      border: 2px solid black;
+      background: rgba(40, 40, 40, 0.95);
+      border: 2px solid white;
       max-height: 200px;
       overflow-y: auto;
       margin-bottom: 10px;
@@ -63,11 +63,12 @@
       gap: 10px;
       cursor: pointer;
       font-family: 'Comic Neue', Comic Sans MS, cursive;
-      font-size: 14px;
+      font-size: 16px;
+      color: white;
       padding: 5px;
     }
     .custom-option:hover {
-      background-color: #f0f0f0;
+      background-color: rgba(255, 255, 255, 0.1);
     }
     .custom-option img {
       width: 40px;
@@ -78,7 +79,7 @@
       background: yellow;
       border: 2px solid black;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 20px;
       padding: 10px;
       font-family: 'Comic Neue', Comic Sans MS, cursive;
       cursor: pointer;
@@ -86,12 +87,15 @@
     #canvas {
       border: 3px solid white;
       background: transparent;
+      width: 100%;
+      max-width: 500px;
     }
     .controls {
-      margin-top: 20px;
+      margin: 20px 0;
       display: flex;
       gap: 20px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .logo-overlay {
       position: fixed;
@@ -101,128 +105,22 @@
       opacity: 0.8;
       pointer-events: none;
     }
+    @media (max-width: 768px) {
+      .wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        width: 90%;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <div class="menu" id="controls"></div>
-    <canvas id="canvas" width="500" height="500"></canvas>
-  </div>
-  <div class="controls">
-    <button onclick="randomize()">RANDOMIZE</button>
-    <button onclick="downloadImage()">SAVE IMAGE</button>
-  </div>
-  <img class="logo-overlay" src="tag001.png" alt="Logo Tag">
-
-  <script>
-    const traits = [
-      { name: 'BG', optional: false },
-      { name: 'back hidden', optional: true, chance: 0.4 },
-      { name: 'SHRT', optional: false },
-      { name: 'head', optional: false },
-      { name: 'eyes', optional: false },
-      { name: 'MOUF', optional: false },
-      { name: 'armor', optional: true, chance: 0.35 },
-      { name: 'HAHT', optional: true, chance: 0.3 },
-      { name: 'shades', optional: true, chance: 0.25 },
-      { name: 'logogogo', optional: false },
-      { name: 'overlay', optional: true, chance: 0.2 },
-    ];
-
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let saveCounter = 1;
-
-    window.onbeforeunload = function () {
-      return 'Are you sure you want to leave this page?';
-    };
-
-    function createControls() {
-      const controls = document.getElementById('controls');
-      traits.forEach(trait => {
-        const label = document.createElement('div');
-        label.className = 'custom-dropdown';
-        label.textContent = trait.name.toUpperCase();
-
-        const optionsBox = document.createElement('div');
-        optionsBox.className = 'custom-options';
-        optionsBox.id = `options-${trait.name}`;
-
-        label.onclick = () => {
-          optionsBox.style.display = optionsBox.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        controls.appendChild(label);
-        controls.appendChild(optionsBox);
-      });
-    }
-
-    async function loadTraitOptions() {
-      for (const trait of traits) {
-        const res = await fetch(`${trait.name}/index.json`);
-        const options = await res.json();
-        const optionsBox = document.getElementById(`options-${trait.name}`);
-        options.forEach(opt => {
-          const item = document.createElement('div');
-          item.className = 'custom-option';
-          const img = document.createElement('img');
-          img.src = `${trait.name}/${opt}`;
-          img.alt = opt;
-          const name = document.createElement('span');
-          name.textContent = opt.replace(/\.[^/.]+$/, "");
-          item.appendChild(img);
-          item.appendChild(name);
-          item.onclick = () => {
-            item.parentNode.dataset.selected = opt;
-            draw();
-          };
-          optionsBox.appendChild(item);
-        });
-      }
-    }
-
-    async function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const trait of traits) {
-        const optionsBox = document.getElementById(`options-${trait.name}`);
-        const selected = optionsBox.dataset.selected;
-        if (selected) {
-          const img = new Image();
-          await new Promise(resolve => {
-            img.onload = () => {
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              resolve();
-            };
-            img.src = `${trait.name}/${selected}`;
-          });
-        }
-      }
-    }
-
-    function randomize() {
-      traits.forEach(trait => {
-        const optionsBox = document.getElementById(`options-${trait.name}`);
-        const imgs = Array.from(optionsBox.querySelectorAll('img'));
-        if (trait.optional && Math.random() > trait.chance) {
-          optionsBox.dataset.selected = "";
-        } else if (imgs.length) {
-          const choice = imgs[Math.floor(Math.random() * imgs.length)];
-          optionsBox.dataset.selected = choice.alt;
-        }
-      });
-      draw();
-    }
-
-    function downloadImage() {
-      const link = document.createElement('a');
-      link.download = `goulerbro-${saveCounter}.png`;
-      saveCounter++;
-      link.href = canvas.toDataURL();
-      link.click();
-    }
-
-    createControls();
-    loadTraitOptions();
-  </script>
+  <!-- Your body content will be appended here -->
 </body>
 </html>
