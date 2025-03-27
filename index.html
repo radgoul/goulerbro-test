@@ -301,7 +301,11 @@
           bot.style.color = 'yellow';
           bot.style.marginLeft = '10px';
           chatBox.appendChild(user);
-          chatBox.appendChild(bot);
+          setTimeout(() => {
+            chatBox.removeChild(typingIndicator);
+            chatBox.appendChild(bot);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 600);
           chatBox.scrollTop = chatBox.scrollHeight;
           this.value = '';
         }
