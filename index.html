@@ -129,6 +129,7 @@
   </style>
 </head>
 <body>
+  <img id="musicToggle" src="emoji.gif" alt="Toggle Music" style="position: fixed; top: 10px; left: 10px; width: 48px; height: 48px; cursor: pointer; z-index: 999;">
   <div class="top-links">
     <a href="https://v1.scatter.art/goulerbros-v2-return-of-goul?tab=market" target="_blank">Scatter Market</a>
     <a href="https://opensea.io/collection/goulers" target="_blank">Goulers</a>
@@ -149,11 +150,7 @@
   </div>
 
   
-    <div class="controls">
-      <button id="toggleMusic" style="background: yellow; border: 2px solid black; font-weight: bold; font-size: 20px; padding: 10px; cursor: pointer;">
-        🎶 MUSIC: ON
-      </button>
-    </div>
+    
     <div class="upload">
 
     <label style="background: yellow; padding: 8px 12px; color: black; font-weight: bold; cursor: pointer; border: 2px solid black;">
@@ -376,7 +373,7 @@
   <script>
     let musicStarted = false;
     const audio = document.getElementById('bgMusic');
-    const toggleMusicBtn = document.getElementById('toggleMusic');
+    const gifToggle = document.getElementById('musicToggle');
 
     document.body.addEventListener('click', () => {
       if (!musicStarted) {
@@ -386,13 +383,13 @@
       }
     });
 
-    toggleMusicBtn.addEventListener('click', () => {
+    gifToggle.addEventListener('click', () => {
       if (audio.paused) {
         audio.play();
-        toggleMusicBtn.textContent = "🎶 MUSIC: ON";
+        // updated via GIF UI
       } else {
         audio.pause();
-        toggleMusicBtn.textContent = "🎶 MUSIC: OFF";
+        // updated via GIF UI
       }
     });
 
