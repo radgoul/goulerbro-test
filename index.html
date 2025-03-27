@@ -135,7 +135,7 @@
     <a href="https://opensea.io/collection/goulerbros" target="_blank">Goulerbros</a>
     <a href="https://opensea.io/collection/goulerbros-v2-retur-of-goul" target="_blank">Goulerbros V2</a>
     <a href="https://x.com/GOULERBROS" target="_blank">@GOULERBROS</a>
-    <a href="#about">About</a>
+    
   </div>
 
   <div class="wrapper">
@@ -157,7 +157,16 @@
 
   <div id="about" style="max-width: 700px; margin: 40px auto; padding: 20px; background: rgba(0,0,0,0.7); border: 2px solid white; border-radius: 10px;">
     <h2 style="color: yellow;">About Goulerbros</h2>
-    <p>Create your own chaotic masterpiece using official Goulerbros trait layers. Powered by vibes, memes, and rad lore. Save, post, remix.</p>
+    
+    <p><strong>EN:</strong> Create your own chaotic masterpiece using official Goulerbros trait layers.</p>
+    <p><strong>ES:</strong> Crea tu propia obra maestra caótica usando capas oficiales de Goulerbros.</p>
+    <p><strong>FR:</strong> Crée ta propre œuvre chaotique avec les couches officielles de Goulerbros.</p>
+    <p><strong>JA:</strong> 公式のGoulerbrosレイヤーを使って自分だけのカオスな作品を作ろう。</p>
+    <p><strong>ZH:</strong> 使用官方Goulerbros图层创建你自己的混乱杰作。</p>
+    <p><strong>AR:</strong> أنشئ تحفتك الفوضوية الخاصة باستخدام طبقات Goulerbros الرسمية.</p>
+    <p><strong>DE:</strong> Erstelle dein eigenes chaotisches Meisterwerk mit offiziellen Goulerbros-Layern.</p>
+    <p><strong>HI:</strong> आधिकारिक Goulerbros लेयर्स का उपयोग करके अपनी खुद की अराजक कृति बनाएं।</p>
+    
   </div>
 
   <img class="logo-overlay" src="tag001.png" alt="Logo Tag">
@@ -301,11 +310,7 @@
           bot.style.color = 'yellow';
           bot.style.marginLeft = '10px';
           chatBox.appendChild(user);
-          setTimeout(() => {
-            chatBox.removeChild(typingIndicator);
-            chatBox.appendChild(bot);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 600);
+          chatBox.appendChild(bot);
           chatBox.scrollTop = chatBox.scrollHeight;
           this.value = '';
         }
@@ -315,7 +320,6 @@
 
   <audio id="bgMusic" src="Koopsta Knicca - Hoe Don't Violate.mp3" loop></audio>
   <script>
-    // Play music on user interaction
     let musicStarted = false;
     document.body.addEventListener('click', () => {
       if (!musicStarted) {
